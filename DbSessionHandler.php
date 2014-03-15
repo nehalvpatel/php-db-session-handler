@@ -140,7 +140,8 @@ WHERE `{$this->session_db_column_id}` = :id;
 SQL
 		);
 		$sth->execute(array(':id' => $id));
-		return '';
+		$results = $sth->fetch();
+		return $results[$this->session_db_column_data];
 	}
 
 	/**
