@@ -1,27 +1,27 @@
 <?php
 
 /**
- * Abstract DbSessionHandler. Test and working for MySQL.
+ * DbSessionHandler. Test and working for MySQL.
  *
  * Recommended database session table.
  *
  * ```sql
  * CREATE TABLE `sessions` (
- *   `id` varchar(63) CHARACTER SET ascii NOT NULL DEFAULT '',
- *   `data` text,
- *   `expire` int(10) unsigned DEFAULT NULL,
- *   PRIMARY KEY (`id`),
- *   KEY `expire` (`expire`)
+ *   `ID` varchar(63) CHARACTER SET ascii NOT NULL DEFAULT '',
+ *   `Data` text,
+ *   `Expire` int(10) unsigned DEFAULT NULL,
+ *   PRIMARY KEY (`ID`),
+ *   KEY `Expire` (`Expire`)
  * ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
  * ```
  *
- * @author KahWee Teng <t@kw.sg>
- * @version 1.1
- * @link http://kw.sg/
- * @copyright Copyright &copy; 2012 KahWee Teng
+ * @author Nehal Patel <nehal@itspatel.com>
+ * @version 1.2
+ * @link http://www.itspatel.com/
+ * @copyright Copyright &copy; 2014 Nehal Patel
  * @license http://www.opensource.org/licenses/mit-license.php
  */
-abstract class DbSessionHandler {
+class DbSessionHandler {
 
 	/**
 	 * @var object PDO object
@@ -31,60 +31,66 @@ abstract class DbSessionHandler {
 	/**
 	 * @var string Sessiondb's table name
 	 */
-	protected $session_db_table = 'sessions';
+	public $session_db_table = 'sessions';
 
 	/**
 	 * @var string Sessiondb's id column name
 	 */
-	protected $session_db_column_id = 'id';
+	public $session_db_column_id = 'ID';
 
 	/**
 	 * @var string Sessiondb's data column name
 	 */
-	protected $session_db_column_data = 'data';
+	public $session_db_column_data = 'Data';
 
 	/**
 	 * @var string Sessiondb's expire/access column name. This is in time().
 	 */
-	protected $session_db_column_expire = 'expire';
+	public $session_db_column_expire = 'Expire';
 
 	/**
 	 * @var string Session's name. Defaults to PHPSESSID
 	 */
-	protected $session_name = null;
+	public $session_name = null;
 
 	/**
 	 * @var integer Session cache expiry time. This is in minutes.
 	 */
-	protected $session_cache_expire_minutes = 120; #2 hours
+	public $session_cache_expire_minutes = 120; #2 hours
+	
 	/**
 	 * @var string The Data Source Name, or DSN, contains the information required to connect to the database.
 	 * @link http://www.php.net/manual/en/pdo.construct.php
 	 */
-	protected $pdo_data_source_name = '';
+	public $pdo_data_source_name = '';
 
 	/**
 	 * @var string The user name for the DSN string. This parameter is optional for some PDO drivers.
 	 */
-	protected $pdo_username = '';
+	public $pdo_username = '';
 
 	/**
 	 * @var string The password for the DSN string. This parameter is optional for some PDO drivers.
 	 */
-	protected $pdo_password = '';
+	public $pdo_password = '';
 
 	/**
 	 * @var integer PDO time out in seconds, defaults to 1.
 	 */
-	protected $pdo_timeout_seconds = 1;
+	public $pdo_timeout_seconds = 1;
 
 	/**
 	 * @var boolean Start immediately after construction
 	 */
-	protected $session_auto_start = false;
+	public $session_auto_start = false;
 
-	public function __construct($start=true) {
-		session_cache_expire($this->session_cache_expire_minutes); #2 hours
+	/**
+	 * Initialize session
+	 *
+	 * @return boolean
+	 */
+	public function initialize() {
+		session_cache_expire($this->session_cache_expire_minutes);
 		$cache_expire = session_cache_expire();
 		session_cache_limiter('private');
 		$cache_limiter = session_cache_limiter();
@@ -101,7 +107,7 @@ abstract class DbSessionHandler {
 	}
 
 	/**
-	 * Initialize session
+	 * Open session
 	 *
 	 * @return boolean
 	 */
@@ -134,9 +140,6 @@ WHERE `{$this->session_db_column_id}` = :id;
 SQL
 		);
 		$sth->execute(array(':id' => $id));
-		if ($rec = $sth->fetch()) {
-			return $rec['data'];
-		}
 		return '';
 	}
 
